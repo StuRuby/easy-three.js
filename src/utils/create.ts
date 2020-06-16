@@ -28,7 +28,7 @@ export function createCamera(
 export function createRender() {
     const render = new THREE.WebGLRenderer();
     render.setSize(window.innerWidth, window.innerHeight);
-    render.setClearColor(new THREE.Color(0, 0, 0));
+    render.setClearColor(new THREE.Color(0x000000));
     document.getElementById("WebGL-output")!.appendChild(render.domElement);
     return render;
 }
