@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import * as dat from 'dat.gui';
 import * as Stats from 'stats.js';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 class App {
     stats!: Stats;
@@ -8,6 +9,7 @@ class App {
     camera!: THREE.Camera;
     scene!: THREE.Scene;
     renderer!: THREE.WebGLRenderer;
+    control!: OrbitControls;
     constructor() {
         this.stats = this.initStats();
         this.setup();
@@ -16,7 +18,7 @@ class App {
     setup() {
         const scene = new THREE.Scene();
         this.scene = scene;
-        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 10000);
         this.camera = camera;
         camera.position.x = 120;
         camera.position.y = 60;
@@ -36,7 +38,26 @@ class App {
 
         scene.add(plane);
 
+        const jsonLoader = new THREE.ObjectLoader();
+        jsonLoader.load(
+            '/dating.json',
+            function (obj) {
+                console.log(obj, 'obj');
+                scene.add(obj);
+            },
+            function (xhr) {
+                console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+            },
+            function (err) {
+                console.log(err, 'err')
+            })
+
         const cubeGeometry = new THREE.BoxGeometry(4, 4, 4);
+
+        const control = new OrbitControls(this.camera, this.renderer.domElement);
+        control.update();
+        this.control = control;
+
 
         for(let i = 0; i < planeGeometry.parameters.height / 5; i++) {
             for(let j = 0; j < planeGeometry.parameters.width / 5; j++) {
@@ -77,6 +98,7 @@ class App {
 
     start() {
         this.stats.update();
+        this.control.update();
         requestAnimationFrame(this.start.bind(this));
         this.renderer.render(this.scene, this.camera);
     }
